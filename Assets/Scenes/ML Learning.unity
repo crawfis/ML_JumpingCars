@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.45097643, g: 0.5008453, b: 0.5743763, a: 1}
+  m_IndirectSpecularColor: {r: 0.45097697, g: 0.5008461, b: 0.5743774, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2168,8 +2168,8 @@ Rigidbody:
   m_GameObject: {fileID: 1313390096}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: 1
+  m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -2224,7 +2224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99d8b01d13b6c9b41bbac0cea2767d2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpForce: 24
+  jumpForce: 9
   _eventsPublisher: {fileID: 1381564327}
 --- !u!1 &1381564326
 GameObject:
@@ -2730,7 +2730,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967241
   m_ObservationStacks: 1
-  m_AlternatingRayOrder: 1
   rayHitColor: {r: 1, g: 0, b: 0, a: 1}
   rayMissColor: {r: 1, g: 1, b: 1, a: 1}
   m_StartVerticalOffset: 0
@@ -2783,7 +2782,6 @@ MonoBehaviour:
   TeamId: 0
   m_UseChildSensors: 0
   m_UseChildActuators: 1
-  m_DeterministicInference: 0
   m_ObservableAttributeHandling: 0
 --- !u!4 &1804185435
 Transform:

@@ -1,5 +1,5 @@
 # ML_JumpingCars
-Machine learning to jump over obstacles. Refactored from public github repo
+Machine learning to jump over obstacles. Refactored from public github repo by Sebastian-Schuchmann: https://github.com/Sebastian-Schuchmann/A.I.-Jumping-Cars-ML-Agents-Example
 
 # Ultimate Walkthrough Example for ML-Agents 1.0+ in Unity3D
 ## Tutorial, how to use this repo

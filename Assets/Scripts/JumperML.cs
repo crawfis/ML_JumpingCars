@@ -37,6 +37,7 @@ namespace CrawfisSoftware.Jumper
             if (_cummulativeReward > EpisodeMaxReward)
             {
                 AddReward(_cummulativeReward);
+                _cummulativeReward = 0;
                 _eventsPublisher.PublishEvent("ScoreReset", this, null);
                 EndEpisode();
             }

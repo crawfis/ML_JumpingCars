@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using CrawfisSoftware.AssetManagement;
 using UnityEngine;
 
 public class KillOnHit : MonoBehaviour
@@ -9,8 +7,11 @@ public class KillOnHit : MonoBehaviour
      * Prevents the usage of resources by destroying
      * all movers hitting this wall. 
      */
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(UnityEngine.Collider other)
     {
-        Destroy(other.gameObject);
+        if (other.gameObject.TryGetComponent<ReleaseOnDestroy>(out ReleaseOnDestroy releaseScript))
+            releaseScript.Release();
+        else
+            Destroy(other.gameObject);
     }
 }

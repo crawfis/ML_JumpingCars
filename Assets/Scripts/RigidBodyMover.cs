@@ -55,8 +55,8 @@ namespace CrawfisSoftware.Jumper
 
             else if (collidedObj.gameObject.CompareTag("Mover") || collidedObj.gameObject.CompareTag("DoubleMover"))
             {
+                _eventsPublisher.PublishEvent("Collision", this, collidedObj.gameObject);
                 Reset();
-                _eventsPublisher.PublishEvent("Collision", this, collidedObj);
             }
         }
 

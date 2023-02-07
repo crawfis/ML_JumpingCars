@@ -1,4 +1,5 @@
 ﻿using CrawfisSoftware.EventManagement;
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -13,12 +14,19 @@ namespace CrawfisSoftware.Jumper
         [SerializeField] private int _scoreIncrement = 1;
 
         private int _score = 0;
-        private int highScore = 0;
+        private int _highScore = 0;
         void Awake()
         {
             //Instance = this;
             _eventsPublisher.SubscribeToEvent("ObstacleAvoided", OnIncreaseScore);
             _eventsPublisher.SubscribeToEvent("JumperReset", OnJumperReset);
+            _eventsPublisher.SubscribeToEvent("ScoreReset", OnHighScoreReset);
+        }
+
+        private void OnHighScoreReset(object sender, object data)
+        {
+            _score = 0;
+            _highScore = 0;
         }
 
         private void OnIncreaseScore(object sender, object data)
@@ -34,11 +42,11 @@ namespace CrawfisSoftware.Jumper
         public void AddScore(int increment)
         {
             _score += increment;
-            if (_score > highScore)
+            if (_score > _highScore)
             {
-                highScore = _score;
+                _highScore = _score;
                 display.text = _score.ToString();
-                _eventsPublisher.PublishEvent("HighScore", this, highScore);
+                _eventsPublisher.PublishEvent("HighScore", this, _highScore);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using CrawfisSoftware.AssetManagement;
+﻿using CrawfisSoftware.Jumper;
 using UnityEngine;
 
 public class KillOnHit : MonoBehaviour
@@ -9,7 +9,7 @@ public class KillOnHit : MonoBehaviour
      */
     private void OnTriggerEnter(UnityEngine.Collider other)
     {
-        if (other.gameObject.TryGetComponent<ReleaseOnDestroy>(out ReleaseOnDestroy releaseScript))
+        if (other.gameObject.TryGetComponent<PooledGameObject>(out PooledGameObject releaseScript))
             releaseScript.Release();
         else
             Destroy(other.gameObject);

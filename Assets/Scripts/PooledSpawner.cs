@@ -1,82 +1,74 @@
-﻿using CrawfisSoftware.AssetManagement;
-using CrawfisSoftware.EventManagement;
-using System;
+﻿using CrawfisSoftware.EventManagement;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
 namespace CrawfisSoftware.Jumper
 {
     //
-    //  Spawns the Mover Objects (Enemies) with an interval you determine.
+    //  Spawns the Mover Objects (Enemies) with an interval you determine. Using Pooling
     // 
     public class PooledSpawner : MonoBehaviour
     {
-        [SerializeField] private ScriptableAssetProviderBase<GameObject> _assetManager;
-        [SerializeField] private List<string> _spawnableObjectNames;
+        [SerializeField] private List<GameObject> _spawnableObjects;
         [Tooltip("The Spawner waits a random number of seconds between these two interval each time a object was spawned.")]
         [SerializeField] private float minSpawnIntervalInSeconds;
         [SerializeField] private float maxSpawnIntervalInSeconds;
         [SerializeField] private EventsPublisher _eventsPublisher;
 
-        //private List<GameObject> spawnedObjects = new List<GameObject>();
-        //private Vector3 _initialSpawnPosition;
+        private IObjectPool<PooledGameObject> objectPool;
 
         private void Awake()
         {
-            //Subscribes to Reset of Player
-            _eventsPublisher.SubscribeToEvent("JumperReset", DestroyAllSpawnedObjects);
+            objectPool = new ObjectPool<PooledGameObject>(OnNewInstanceForPool, OnRemovedFromPool, OnReleasedBackToPool);
         }
 
         private IEnumerator Start()
         {
-            yield return _assetManager.Initialize();
-            //_initialSpawnPosition = transform.localPosition;
-            StartCoroutine(nameof(Spawn));
+            yield return StartCoroutine(nameof(Spawn));
         }
 
         private IEnumerator Spawn()
         {
             while (true)
             {
-                //var spawned = Instantiate(GetRandomSpawnableFromList(), transform.position, transform.rotation, transform);
-                //spawnedObjects.Add(spawned);
-                //var task = _assetManager.GetAsync(GetRandomSpawnableFromList());
-                _ = SpawnAsync();
+                objectPool.Get();
                 yield return new WaitForSeconds(Random.Range(minSpawnIntervalInSeconds, maxSpawnIntervalInSeconds));
             }
         }
 
-        private async Task SpawnAsync()
+        private GameObject GetRandomSpawnableFromList()
         {
-            GameObject spawned = await _assetManager.GetAsync(GetRandomSpawnableFromList());
-            if (spawned == null) return;
+            int randomIndex = Random.Range(0, _spawnableObjects.Count);
+            return _spawnableObjects[randomIndex];
+        }
 
+        private PooledGameObject OnNewInstanceForPool()
+        {
+            GameObject spawned = Instantiate(GetRandomSpawnableFromList());
             spawned.transform.localPosition = Vector3.zero;
             //spawned.transform.localRotation = Quaternion.identity;
-            if (!spawned.TryGetComponent<ReleaseOnDestroy>(out _))
+            if (!spawned.TryGetComponent<PooledGameObject>(out PooledGameObject releaseScript))
             {
-                var releaseScript = spawned.AddComponent<ReleaseOnDestroy>();
-                releaseScript.SetAssetManager(_assetManager);
+                releaseScript = spawned.AddComponent<PooledGameObject>();
+                releaseScript.SetPoolInstance(objectPool);
                 spawned.gameObject.transform.SetParent(transform, false);
+                spawned.gameObject.transform.localPosition = Vector3.zero;
             }
+            return releaseScript;
         }
 
-        private void DestroyAllSpawnedObjects(object sender, object data)
+        public void OnRemovedFromPool(PooledGameObject pooledInstance)
         {
-            _assetManager.ReleaseAllAsync();
-            //for (int i = spawnedObjects.Count - 1; i >= 0; i--)
-            //{
-            //    Destroy(spawnedObjects[i]);
-            //    spawnedObjects.RemoveAt(i);
-            //}
+            pooledInstance.gameObject.SetActive(true);
+            pooledInstance.gameObject.transform.localPosition = Vector3.zero;
         }
-        private string GetRandomSpawnableFromList()
+
+        public void OnReleasedBackToPool(PooledGameObject pooledInstance)
         {
-            int randomIndex = Random.Range(0, _spawnableObjectNames.Count);
-            return _spawnableObjectNames[randomIndex];
+            pooledInstance.gameObject.SetActive(false);
         }
     }
 }

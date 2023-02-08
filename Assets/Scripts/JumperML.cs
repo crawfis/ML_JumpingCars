@@ -1,5 +1,4 @@
-﻿using CrawfisSoftware.AssetManagement;
-using CrawfisSoftware.EventManagement;
+﻿using CrawfisSoftware.EventManagement;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using UnityEngine;
@@ -48,7 +47,7 @@ namespace CrawfisSoftware.Jumper
             AddReward(-100.0f);
             //Debug.Log(GetCumulativeReward());
             GameObject mover = data as GameObject;
-            if (mover != null && mover.TryGetComponent<ReleaseOnDestroy>(out ReleaseOnDestroy releaseScript))
+            if (mover != null && mover.TryGetComponent<PooledGameObject>(out PooledGameObject releaseScript))
                 releaseScript.Release();
             EndEpisode();
         }

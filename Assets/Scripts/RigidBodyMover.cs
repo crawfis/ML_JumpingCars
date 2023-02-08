@@ -12,7 +12,6 @@ namespace CrawfisSoftware.Jumper
         private bool jumpIsReady = true;
         private Rigidbody rBody;
         private Vector3 startingPosition;
-        public event Action OnReset;
 
         public bool CanJump {  get {  return jumpIsReady; } }
 

@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 8824425999163027327}
   m_Layer: 0
   m_Name: MLPlayer
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -189,8 +189,10 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  jumpForce: 28
+  _rigidBodyMover: {fileID: 0}
   jumpKey: 32
+  _eventsPublisher: {fileID: 0}
+  EpisodeMaxReward: 50
 --- !u!114 &3421999703542401049
 MonoBehaviour:
   m_ObjectHideFlags: 0

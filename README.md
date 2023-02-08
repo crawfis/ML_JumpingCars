@@ -4,11 +4,11 @@ Machine learning to train an agent to jump over obstacles with some analysis and
 ## Rationale
 I am the type of person who is always asking why. As such I wanted to use this simple (and excellent) example to explore machine learning and in particular Reinforcement Learning used in Unity's ML Agents. This is from a simple "walkthrough of building an A.I. with Unity’s ML-Agents". See that tutorial first. I will discuss the results, ask many questions, present various issues with even this simple example and show how to refactor this code (and any of the ML Agents code) to be cleaner and have a separation of concerns. I also wanted to upgrade to ML Agents 2.0+.
 ## Outline
-I. Refactoring the code base (can be skipped).
-II. Examining the results.
-III. Understanding the ML decisions made.
-IV. Looking at different simulations, ML parameters, etc.
-V. Extensions.
+1. Refactoring the code base (can be skipped).
+2. Examining the results.
+3. Understanding the ML decisions made.
+4. Looking at different simulations, ML parameters, etc.
+5. Extensions.
 
 ![Car jumping over another car](CarJumpingOverCar_01.png)
 

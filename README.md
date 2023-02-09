@@ -40,6 +40,7 @@ The basic behaviour was that the user could hit the space key to jump straight u
 * Obstacle Avoided
 * Collision
 * JumpRequested
+* JumpPerformed
 * JumperReset
 * HighScore (For ScoreCollector which uses Academy.Instance.StatsRecorder.
 ### Pulling user interactions out
@@ -50,6 +51,25 @@ The basic behaviour was that the user could hit the space key to jump straight u
 Positioning prefabs to the origin, changing an OnCollision to an OnTrigger, etc.
 ### Automatically creating multiple agents and environments.
 Once I had everything working and was able to successfully train. I was too lazy to Duplicate the simulation hierarchy and create multiple copies of the agents (not sure this is of much use either). So I made the simulation an environment and then wrote a simple script (CreateTrainingAgents.cs) that would create multiple agents spaced out by some Vector3.
+### Final Components
+1. A moving background (using an animator) which included the road, the grass and the lightpoles.
+   * The street has a tag of Street.
+   * Street and everything was moved to be at a height of 0.
+2. A "PlayerController" that fires an event based on input (or AI Decision) that asks the listener to jump.
+3. Enemy cars with the tag Mover.
+   * Unchanged except for moving to the origin
+4. A trigger at the end of the street that Destroys the moving enemy cars.
+   * It now returns the object to the Pooler.
+5. A Spawner that creates new instances of enemy cars.
+   * It now uses Pooling.
+6. A Score Display that would show the High Score only. The High score was the maximum number of consecutive cars jumped over. 
+   * It now does this with events.
+7. New RigidBodyMover (better name would have been RigidBodyJumper)
+   * Listens for a JumpRequested event and determines whether it can.
+   * Fires a JumpPerformed event when a jump is performed.
+8. New PlayerML that handles the rewards, decisions, etc.
+   * Uses RigidBodyMover's CanJump to determine if a decision is requested.
+
 ## Results
 So now we can use PlayerML with the given events to train jumping. The original poster mentioned that it works quite well. He based this on the score being printed, rather than using the resulting brain (onnx file). Some questions now that we have something working:
 1. What does it mean for an AI Agent to "work"? What do we expect in this use case?
@@ -70,7 +90,13 @@ Curiously, the cars spawn about 30m away from the player, so as soon as they spa
 1. What should the raycast distance be?
 2. What happens if the raycast returns no intersections? Seems fine as there may not be any cars spawned.
 3. Many episodes fail fairly quickly as the first car is hit. Successful jumps keep going until eventually a car is hit. Ideally we would never end an episode with a perfect AI. Is this a good strategy?
-### Physic constraints
+4. The trained model may jump for no reason. This might eventually be trained out as while it is jumping it cannot jump again or jump in time for the next enemy. What are other strategies and what is the best strategy to differentiate the reward for a good jump vs. a worthless jump?
+5. Other questions resolve around the design of the simulation. The only randomness here is the distance between incoming cars.
+6. Should we request a decision every physics update or every 5, etc.? How does the --time-scale affect this?
+7. Why not only request a decision if the distance is less than some threshold?
+8. If we add randomness to other parameters (see Magic numbers below) then what additional observations do we need?
+
+### Physics constraints
 Lets examine the physics of this simple app. Consider just a single obstacle / enemy moving towards the player. Let's assume the enamy has a box of width w, and height h. When the player jumps the key values are: a) time until the player clears a height of h; b) Total height of the jump; c) time when player reenters a height less than h. Value b) is not needed for this example but may come into play later. With this simple example there is a maximum distance and a minimum distance from the enemy to start a jump. Enemies spawn somewhere between 1.5 seconds and 3 seconds apart. At 20 meters per second, they spawn from 30 and 60 meters apart. The jump also takes about 0.5 seconds (Curiously the physics on one identical project is different :-(), so an enemy moves 10 meters during this time. Recall, that the car / player cannot jump until they land (intersect with the street). This suggests that there is plenty of time for each jump and the AI should be able to learn to be perfect. If we increase the jump height / duration and / or increase the enemy speed, then they there is a very tight window to jump between 2 cars spaced 1.5 seconds apart. If the jump actually takes longer or the cars are spawned quicker, then no AI (or human) can accomplish the jumps when we randomly hit this case of closely spaced cars. 
 
 ### Episode training versus Continuous Training
@@ -80,7 +106,8 @@ Lets examine the physics of this simple app. Consider just a single obstacle / e
 If we do populate the simulation with many instances, what is the best strategy?
 
 ## Magic Numbers
-Speed, Box Collider size, Jump force, Drag, 
+Enemy spacing, enemy speed, enemy Box Collider size, player jump force, Drag, etc.
+We could extend the Environment with settings to config all of these random numbers. We would also need to add additional observations.
 
 ## Extensions
 Double jumps, Controlled force.

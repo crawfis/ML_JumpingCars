@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.Scripts
+namespace CrawfisSoftware.Jumper
 {
     internal class CreateTrainingAgents : MonoBehaviour
     {

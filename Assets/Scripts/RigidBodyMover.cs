@@ -1,45 +1,58 @@
 ﻿using CrawfisSoftware.EventManagement;
-using System;
 using UnityEngine;
 
 namespace CrawfisSoftware.Jumper
 {
+    [RequireComponent(typeof(Rigidbody))]
     internal class RigidBodyMover : MonoBehaviour
     {
-        [SerializeField] private float jumpForce;
+        [SerializeField] private float _jumpForce;
         [SerializeField] private EventsPublisher _eventsPublisher;
 
-        private bool jumpIsReady = true;
-        private Rigidbody rBody;
-        private Vector3 startingPosition;
+        private bool _jumpIsReady = true;
+        private bool _jumpNow = false;
+        private Rigidbody _rBody;
+        private Vector3 _startingPosition;
 
-        public bool CanJump {  get {  return jumpIsReady; } }
+        public bool CanJump {  get {  return _jumpIsReady; } }
 
         public void Awake()
         {
-            rBody = GetComponent<Rigidbody>();
-            startingPosition = transform.position;
+            _rBody = GetComponent<Rigidbody>();
+            _startingPosition = transform.position;
             _eventsPublisher.SubscribeToEvent("JumpRequested", OnJumpRequest);
+            _jumpVelocity = new Vector3(0, _jumpForce, 0);
         }
 
-
+        private Vector3 _jumpVelocity;
         private void OnJumpRequest(object sender, object data)
         {
-            if (jumpIsReady)
+            if (_jumpIsReady)
             {
-                rBody.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
-                jumpIsReady = false;
-                _eventsPublisher.PublishEvent("JumpPerformed", this, jumpForce);
+                //rBody.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+                _jumpNow = true;
+                _jumpIsReady = false;
+                _eventsPublisher.PublishEvent("JumpPerformed", this, _jumpForce);
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if (_jumpNow)
+            {
+                //rBody.velocity = _jumpVelocity;
+                _rBody.AddForce(new Vector3(0, _jumpForce, 0), ForceMode.Impulse);
+                _jumpNow = false;
             }
         }
 
         private void Reset()
         {
-            jumpIsReady = true;
+            _jumpIsReady = true;
 
             //Reset Movement and Position
-            transform.position = startingPosition;
-            rBody.velocity = Vector3.zero;
+            transform.position = _startingPosition;
+            _rBody.velocity = Vector3.zero;
 
             _eventsPublisher.PublishEvent("JumperReset", this, null);
         }
@@ -48,8 +61,8 @@ namespace CrawfisSoftware.Jumper
         {
             if (collidedObj.gameObject.CompareTag("Street"))
             {
-                jumpIsReady = true;
-                rBody.velocity = Vector3.zero;
+                _jumpIsReady = true;
+                _rBody.velocity = Vector3.zero;
             }
 
             else if (collidedObj.gameObject.CompareTag("Mover") || collidedObj.gameObject.CompareTag("DoubleMover"))

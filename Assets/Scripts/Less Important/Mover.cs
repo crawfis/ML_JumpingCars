@@ -1,22 +1,26 @@
 ﻿using UnityEngine;
 
-/*
- * Simple Enemy script. It just moves forward with a speed you determine
- */
-[RequireComponent(typeof(Rigidbody))]
-public class Mover : MonoBehaviour
+namespace CrawfisSoftware.Jumper
 {
-    [SerializeField] private float speed;
-    private Rigidbody Rigidbody;
 
-
-    private void Awake()
+    /*
+     * Simple Enemy script. It just moves forward with a speed you determine
+     */
+    [RequireComponent(typeof(Rigidbody))]
+    public class Mover : MonoBehaviour
     {
-        Rigidbody = GetComponent<Rigidbody>();
-    }
+        [SerializeField] private float speed;
+        private Rigidbody Rigidbody;
 
-    private void FixedUpdate()
-    {
-        Rigidbody.velocity = Vector3.back * speed;
+
+        private void Awake()
+        {
+            Rigidbody = GetComponent<Rigidbody>();
+        }
+
+        private void FixedUpdate()
+        {
+            Rigidbody.velocity = Vector3.back * speed;
+        }
     }
 }

@@ -4,15 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-/*
- * Simple class to randomize the appearance of the Movers
- */
-public class RandomColorOnSpawn : MonoBehaviour
+namespace CrawfisSoftware.Jumper
 {
-    [SerializeField] private int materialIndexToRandomize;
-    
-    private void Awake()
+
+    /*
+     * Simple class to randomize the appearance of the Movers
+     */
+    public class RandomColorOnSpawn : MonoBehaviour
     {
-        GetComponent<MeshRenderer>().materials[materialIndexToRandomize].color = Random.ColorHSV();
+        [SerializeField] private int materialIndexToRandomize;
+
+        private void Awake()
+        {
+            GetComponent<MeshRenderer>().materials[materialIndexToRandomize].color = Random.ColorHSV();
+        }
     }
 }

@@ -1,17 +1,19 @@
-﻿using CrawfisSoftware.Jumper;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class KillOnHit : MonoBehaviour
+namespace CrawfisSoftware.Jumper
 {
-    /*
-     * Prevents the usage of resources by destroying
-     * all movers hitting this wall. 
-     */
-    private void OnTriggerEnter(UnityEngine.Collider other)
+    public class KillOnHit : MonoBehaviour
     {
-        if (other.gameObject.TryGetComponent<PooledGameObject>(out PooledGameObject releaseScript))
-            releaseScript.Release();
-        else
-            Destroy(other.gameObject);
+        /*
+         * Prevents the usage of resources by destroying
+         * all movers hitting this wall. 
+         */
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.TryGetComponent(out PooledGameObject releaseScript))
+                releaseScript.Release();
+            else
+                Destroy(other.gameObject);
+        }
     }
 }

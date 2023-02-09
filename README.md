@@ -43,7 +43,7 @@ The basic behaviour was that the user could hit the space key to jump straight u
 * JumperReset
 * HighScore (For ScoreCollector which uses Academy.Instance.StatsRecorder.
 ### Pulling user interactions out
-(See Player.cs)
+(See JumperController.cs and RigidBodyMover.cs)
 ### Pulling Machine Learning out
 (see PlayerML.cs)
 ### General Clean-up
@@ -62,12 +62,19 @@ So now we can use PlayerML with the given events to train jumping. The original 
    * With my script I can create 1000's of agents if I want to. Almost all of the tutorials mention this as an optimization. Not sure exactly why (500 FPS vs 20 FPS) and I suspect there is more to this which we will address below. In particular, if all agents have the same behavior and the simulation has no randomness to it, is there a benefit to this?
 
 More to come.
+
 ## Analyzing the Process / Choices
 ### Sebastian's AI choices
-Sebastian made the choice that the only Observation was the distance to the next car. He used a raycast (sphere cast) to find this distance using Unity's built-in Ray Perception Sensor 3D. He used 1 ray with a maximum search distance of 50m. Curiously, the cars spawn about 30m away from the player, so as soon as they spawn there is a distance calculated. He could have made this much shorter. In fact with this simple example there is a maximum distance and a minimum distance to start a jump given only one enemy at a time. Enemies spawn somewhere between 1.5 seconds and 3 seconds apart. At 20 meters per second, they spawn from 30 and 60 meters apart. The jump also takes about 0.5 seconds (I might have changed the physics some on this), so an enemy moves 10 meters during this time. Recall, that the car / player cannot jump until they land (intersect with the street). This suggests that there is plenty of time for each jump and the AI should be able to learn to be perfect. If we increase the jump height / duration and / or increase the enemy speed, then they there is a very tight window to jump between 2 cars spaced 1.5 seconds apart. If the jump actually takes longer or the cars are spawned quicker, then no AI (or human) can accomplish the jumps when we randomly hit this case of closely spaced cars. 
+Sebastian made the choice that the only Observation was the distance to the next car. He used a raycast (sphere cast) to find this distance using Unity's built-in Ray Perception Sensor 3D. He used 1 ray with a maximum search distance of 50m. He used Episodic training and ends an episode on failing only (colliding with an enemy car). I haven't looked at the various hyperparameters yet, but the PPO algorithm is used. His other choice was to request decisions every physics step (100 per second) but only if the car was not in the process of jumping.
+Curiously, the cars spawn about 30m away from the player, so as soon as they spawn there is a distance calculated from the ray casting. He could have made this much shorter or longer which leads to the first few questions: 
+1. What should the raycast distance be?
+2. What happens if the raycast returns no intersections? Seems fine as there may not be any cars spawned.
+3. Many episodes fail fairly quickly as the first car is hit. Successful jumps keep going until eventually a car is hit. Ideally we would never end an episode with a perfect AI. Is this a good strategy?
+### Physic constraints
+Lets examine the physics of this simple app. Consider just a single obstacle / enemy moving towards the player. Let's assume the enamy has a box of width w, and height h. When the player jumps the key values are: a) time until the player clears a height of h; b) Total height of the jump; c) time when player reenters a height less than h. Value b) is not needed for this example but may come into play later. With this simple example there is a maximum distance and a minimum distance from the enemy to start a jump. Enemies spawn somewhere between 1.5 seconds and 3 seconds apart. At 20 meters per second, they spawn from 30 and 60 meters apart. The jump also takes about 0.5 seconds (Curiously the physics on one identical project is different :-(), so an enemy moves 10 meters during this time. Recall, that the car / player cannot jump until they land (intersect with the street). This suggests that there is plenty of time for each jump and the AI should be able to learn to be perfect. If we increase the jump height / duration and / or increase the enemy speed, then they there is a very tight window to jump between 2 cars spaced 1.5 seconds apart. If the jump actually takes longer or the cars are spawned quicker, then no AI (or human) can accomplish the jumps when we randomly hit this case of closely spaced cars. 
 
 ### Episode training versus Continuous Training
-Why not end an Episode if the AI successfully jumps over N cars?
+1. Why not end an Episode if the AI successfully jumps over N cars?
 
 ### Multiple training instances
 If we do populate the simulation with many instances, what is the best strategy?
@@ -79,3 +86,7 @@ Speed, Box Collider size, Jump force, Drag,
 Double jumps, Controlled force.
 
 ## Usefulness of Trained Model
+It seems like the model trained is only valid for:
+* A player model with the same mass, drag, force jump, etc. Actually any model that provides the same timings to clear and stay clear of the enemy height h.
+* Enemies with a specific height and width
+* Relative velocties between the player and the enemy of the fixed speed.

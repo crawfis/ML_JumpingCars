@@ -1,4 +1,4 @@
-# Refactoring tutorial on ML-Agents 1.0+ in Unity3D
+# Refactoring Sebastian's ML Agents tutorial in Unity3D
 Machine learning to train an agent to jump over obstacles with some analysis and rationale on various design decision. Refactored from public github repo by Sebastian-Schuchmann: https://github.com/Sebastian-Schuchmann/A.I.-Jumping-Cars-ML-Agents-Example
 
 ## Rationale
